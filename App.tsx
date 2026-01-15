@@ -126,7 +126,8 @@ const GenderedWord: React.FC<{
   plural?: string;
   className?: string;
   hidePluralInWord?: boolean;
-}> = ({ gender, word, plural, className = "", hidePluralInWord = false }) => {
+  allowWrap?: boolean;
+}> = ({ gender, word, plural, className = "", hidePluralInWord = false, allowWrap = false }) => {
   const cleanWord = word.replace(/^(der|die|das)\s+/i, '').trim();
   
   const getGenderText = () => {
@@ -152,7 +153,7 @@ const GenderedWord: React.FC<{
   const genderLabel = getGenderText();
 
   return (
-    <span className={`${getColorClass()} ${className} font-bold inline-flex items-baseline gap-1.5 whitespace-nowrap`}>
+    <span className={`${getColorClass()} ${className} font-bold inline-flex items-baseline gap-1.5 ${allowWrap ? 'flex-wrap justify-center' : 'whitespace-nowrap'}`}>
       {genderLabel && <UmlautRenderer text={genderLabel} />}
       <UmlautRenderer text={cleanWord} />
       {plural && plural !== '-' && !hidePluralInWord && (
@@ -566,7 +567,8 @@ const VocabularyReview: React.FC<{
       source: 'Wörterbuch', 
       custom: true, 
       plural: '',
-      english: v.meaning 
+      english: v.meaning,
+      example: '' 
     }));
     return [...lessonVocab, ...custom];
   }, [lessonCache, completedIds, customVocab]);
@@ -574,33 +576,33 @@ const VocabularyReview: React.FC<{
   const displayVocab = view === 'custom' ? allVocab.filter(v => v.custom) : allVocab;
 
   const renderCardFront = (v: any, i: number | string) => (
-    <div className="absolute inset-0 bg-white border p-6 rounded-2xl [backface-visibility:hidden] flex flex-col justify-between items-center text-center">
-      <div className="w-full text-[10px] font-bold text-indigo-500 flex justify-between uppercase">
-        <span>{v.source}</span>
+    <div className="absolute inset-0 bg-white border p-6 rounded-2xl [backface-visibility:hidden] flex flex-col justify-between items-center text-center overflow-hidden select-none">
+      <div className="w-full text-[10px] font-bold text-indigo-500 flex justify-between uppercase shrink-0">
+        <span className="truncate max-w-[70%]">{v.source}</span>
         {v.custom && (
           <button 
             onClick={(e) => { e.stopPropagation(); onRemoveCustomWord(v.word); }}
-            className="text-red-400 hover:text-red-600"
+            className="text-red-400 hover:text-red-600 shrink-0"
           >
             Entfernen
           </button>
         )}
       </div>
       
-      <div className="flex flex-col items-center gap-4 py-4 flex-1 justify-center">
-        {/* The main German word with article and correct spacing */}
-        <GenderedWord gender={v.gender} word={v.word} className="text-3xl" hidePluralInWord={true} />
+      <div className="flex flex-col items-center gap-2 py-4 flex-1 justify-center w-full min-h-0 overflow-hidden">
+        {/* FRONT: Big German Word with wrap support */}
+        <GenderedWord gender={v.gender} word={v.word} className="text-3xl leading-tight text-center break-words max-w-full" hidePluralInWord={true} allowWrap={true} />
         
-        {/* The English translation - prominent and clearly visible on the front */}
-        <div className="text-xl text-indigo-600 font-extrabold px-4 leading-tight">
+        {/* FRONT: English translation underneath word */}
+        <div className="text-lg text-indigo-600 font-extrabold px-2 leading-snug line-clamp-3 overflow-hidden text-center break-words max-w-full">
           {v.english || v.meaning}
         </div>
 
-        {/* The Plural form in German - prominently displayed on the front */}
+        {/* FRONT: Plural below English */}
         {v.plural && v.plural !== '-' && (
-          <div className="mt-2 flex items-center gap-2 px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-xs font-bold text-slate-500 uppercase tracking-widest shadow-sm">
-            <span>Plural:</span>
-            <span className="text-indigo-600">
+          <div className="mt-1 flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-bold text-slate-500 uppercase tracking-widest shadow-sm shrink-0">
+            <span className="whitespace-nowrap">Plural:</span>
+            <span className="text-indigo-600 truncate max-w-[100px]">
               {v.gender === 'none' ? '' : 'die '}
               {v.word.replace(/^(der|die|das)\s+/i, '').trim()}{v.plural}
             </span>
@@ -608,7 +610,19 @@ const VocabularyReview: React.FC<{
         )}
       </div>
       
-      <div className="text-[10px] text-slate-300 font-medium italic">Klicken zum Wenden</div>
+      <div className="text-[9px] text-slate-300 font-medium italic shrink-0">Klicken zum Wenden</div>
+    </div>
+  );
+
+  const renderCardBack = (v: any) => (
+    <div className="absolute inset-0 bg-indigo-600 rounded-2xl p-6 text-white flex flex-col items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden select-none">
+      {/* BACK: Sample Sentence in German */}
+      <div className="text-lg font-bold leading-relaxed mb-4 line-clamp-5 overflow-hidden">
+        {v.example ? <UmlautRenderer text={v.example} /> : <span className="opacity-50 italic">Beispiel wird geladen...</span>}
+      </div>
+      <div className="mt-2 pt-3 border-t border-indigo-400/50 w-full text-[10px] font-black uppercase tracking-widest opacity-60 shrink-0">
+        Beispielsatz (DE)
+      </div>
     </div>
   );
 
@@ -626,12 +640,10 @@ const VocabularyReview: React.FC<{
 
         {view === 'flashcards' && displayVocab.length > 0 ? (
           <div className="flex flex-col items-center">
-            <div onClick={() => setFlipped(p => ({...p, curr: !p.curr}))} className="w-full max-w-lg h-96 cursor-pointer">
+            <div onClick={() => setFlipped(p => ({...p, curr: !p.curr}))} className="w-full max-w-lg h-[350px] cursor-pointer">
               <div className={`relative h-full w-full rounded-3xl shadow-2xl transition-all duration-700 [transform-style:preserve-3d] ${flipped.curr ? '[transform:rotateY(180deg)]' : ''}`}>
                 {renderCardFront(displayVocab[currentCardIndex], 'flash')}
-                <div className="absolute inset-0 bg-indigo-600 rounded-3xl p-10 text-white flex items-center justify-center text-center leading-relaxed [backface-visibility:hidden] [transform:rotateY(180deg)] text-2xl font-bold overflow-y-auto">
-                  {displayVocab[currentCardIndex].meaning}
-                </div>
+                {renderCardBack(displayVocab[currentCardIndex])}
               </div>
             </div>
             <div className="flex gap-8 mt-10 items-center">
@@ -641,14 +653,12 @@ const VocabularyReview: React.FC<{
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-12">
             {displayVocab.map((v, i) => (
               <div key={`${v.word}-${i}`} onClick={() => setFlipped(p => ({...p, [i]: !p[i]}))} className="group h-64 cursor-pointer relative">
                 <div className={`relative h-full w-full rounded-2xl shadow-sm transition-all duration-500 [transform-style:preserve-3d] ${flipped[i] ? '[transform:rotateY(180deg)]' : ''}`}>
                   {renderCardFront(v, i)}
-                  <div className="absolute inset-0 bg-indigo-600 p-6 rounded-2xl text-white flex items-center justify-center text-center font-bold text-lg [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-y-auto">
-                    {v.meaning}
-                  </div>
+                  {renderCardBack(v)}
                 </div>
               </div>
             ))}

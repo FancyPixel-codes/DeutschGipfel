@@ -13,6 +13,7 @@ export interface Lesson {
       meaning: string;
       gender: 'der' | 'die' | 'das' | 'plural' | 'none';
       plural?: string;
+      example?: string;
     }>;
     grammarPoint: {
       title: string;

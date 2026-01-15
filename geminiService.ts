@@ -16,7 +16,7 @@ export async function generateLessonContent(chapterId: string, title: string, to
     1. A sophisticated B2-level reading text (approx 400 words).
     2. A glossary: An array of objects where each object has a "german" key (difficult word) and an "english" key (its translation).
     3. 15 key vocabulary terms. IMPORTANT: If the word is a noun, provide it WITHOUT the article (e.g., 'Brauch' instead of 'der Brauch').
-       - For each term: provide word, meaning (German), gender (der, die, das, plural, none), and plural suffix (e.g., 'e', 'en', 'n', 'er', 's', or '-' for no change).
+       - For each term: provide word, meaning (English), gender (der, die, das, plural, none), plural suffix (e.g., 'e', 'en', 'n', 'er', 's', or '-' for no change), and example (a short, natural German sentence using the word).
     4. A grammar explanation relevant to B2 level.
     5. A listening script.
     6. A homework writing prompt.`,
@@ -45,9 +45,10 @@ export async function generateLessonContent(chapterId: string, title: string, to
                 word: { type: Type.STRING },
                 meaning: { type: Type.STRING },
                 gender: { type: Type.STRING, enum: ["der", "die", "das", "plural", "none"] },
-                plural: { type: Type.STRING }
+                plural: { type: Type.STRING },
+                example: { type: Type.STRING }
               },
-              required: ["word", "meaning", "gender"]
+              required: ["word", "meaning", "gender", "example"]
             }
           },
           grammarPoint: {
