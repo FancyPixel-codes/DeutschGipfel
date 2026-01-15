@@ -175,13 +175,13 @@ const WordRenderer: React.FC<{
   text: string; 
   glossary: Record<string, string>;
   isWordSaved: (word: string) => boolean;
-  onToggleWord: (word: string, translation: string, grammarNote?: string) => void;
+  onToggleWord: (word: string, translation: string, grammarNote?: string, example?: string) => void;
 }> = ({ text, glossary, isWordSaved, onToggleWord }) => {
-  const [selectedWord, setSelectedWord] = useState(null as { word: string, translation: string, grammarNote?: string, x: number, y: number, loading?: boolean } | null);
-  const [localGlossary, setLocalGlossary] = useState({} as Record<string, { t: string, g?: string }>);
+  const [selectedWord, setSelectedWord] = useState(null as { word: string, translation: string, grammarNote?: string, example?: string, x: number, y: number, loading?: boolean } | null);
+  const [localGlossary, setLocalGlossary] = useState({} as Record<string, { t: string, g?: string, e?: string }>);
 
   useEffect(() => {
-    const initial: Record<string, { t: string, g?: string }> = {};
+    const initial: Record<string, { t: string, g?: string, e?: string }> = {};
     Object.keys(glossary).forEach((k) => {
       initial[k] = { t: glossary[k] };
     });
@@ -200,15 +200,15 @@ const WordRenderer: React.FC<{
     const y = rect.top + window.scrollY - 90;
 
     if (localGlossary[lowerClean]) {
-      setSelectedWord({ word: clean, translation: localGlossary[lowerClean].t, grammarNote: localGlossary[lowerClean].g, x, y });
+      setSelectedWord({ word: clean, translation: localGlossary[lowerClean].t, grammarNote: localGlossary[lowerClean].g, example: localGlossary[lowerClean].e, x, y });
       return;
     }
 
     setSelectedWord({ word: clean, translation: 'Wird übersetzt...', x, y, loading: true });
     try {
       const data = await translateWordAndGetGrammar(clean, text);
-      setLocalGlossary(prev => ({ ...prev, [lowerClean]: { t: data.translation, g: data.grammarNote } }));
-      setSelectedWord({ word: clean, translation: data.translation, grammarNote: data.grammarNote, x, y, loading: false });
+      setLocalGlossary(prev => ({ ...prev, [lowerClean]: { t: data.translation, g: data.grammarNote, e: data.example } }));
+      setSelectedWord({ word: clean, translation: data.translation, grammarNote: data.grammarNote, example: data.example, x, y, loading: false });
     } catch (err) {
       setSelectedWord({ word: clean, translation: 'Fehler', x, y, loading: false });
     }
@@ -254,7 +254,7 @@ const WordRenderer: React.FC<{
             </div>
             {!selectedWord.loading && selectedWord.translation !== 'Fehler' && (
               <button 
-                onClick={(e) => { e.stopPropagation(); onToggleWord(selectedWord.word, selectedWord.translation, selectedWord.grammarNote); setSelectedWord(null); }}
+                onClick={(e) => { e.stopPropagation(); onToggleWord(selectedWord.word, selectedWord.translation, selectedWord.grammarNote, selectedWord.example); setSelectedWord(null); }}
                 className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg flex-shrink-0 transition-colors ${
                   isWordSaved(selectedWord.word) ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-500'
                 }`}
@@ -347,7 +347,7 @@ const LessonView: React.FC<{
   isGenerating: boolean;
   onHomeworkSubmit: (text: string) => void;
   isWordSaved: (word: string) => boolean;
-  onToggleWord: (word: string, translation: string, grammarNote?: string) => void;
+  onToggleWord: (word: string, translation: string, grammarNote?: string, example?: string) => void;
   submission?: HomeworkSubmission;
   isGrading: boolean;
 }> = ({ lessonId, lesson, isGenerating, onHomeworkSubmit, isWordSaved, onToggleWord, submission, isGrading }) => {
@@ -449,7 +449,7 @@ const LessonView: React.FC<{
                                   </div>
                                 </div>
                                 <button 
-                                  onClick={() => onToggleWord(v.word, v.meaning)} 
+                                  onClick={() => onToggleWord(v.word, v.meaning, undefined, v.example)} 
                                   className={`p-2 transition-all rounded-lg ${saved ? 'text-red-500 bg-red-50 hover:bg-red-100' : 'text-indigo-300 hover:text-indigo-600 hover:bg-indigo-50'}`}
                                 >
                                   {saved ? (
@@ -568,7 +568,7 @@ const VocabularyReview: React.FC<{
       custom: true, 
       plural: '',
       english: v.meaning,
-      example: '' 
+      example: v.example || '' 
     }));
     return [...lessonVocab, ...custom];
   }, [lessonCache, completedIds, customVocab]);
@@ -617,8 +617,8 @@ const VocabularyReview: React.FC<{
   const renderCardBack = (v: any) => (
     <div className="absolute inset-0 bg-indigo-600 rounded-2xl p-6 text-white flex flex-col items-center justify-center text-center [backface-visibility:hidden] [transform:rotateY(180deg)] overflow-hidden select-none">
       {/* BACK: Sample Sentence in German */}
-      <div className="text-lg font-bold leading-relaxed mb-4 line-clamp-5 overflow-hidden">
-        {v.example ? <UmlautRenderer text={v.example} /> : <span className="opacity-50 italic">Beispiel wird geladen...</span>}
+      <div className="text-lg font-bold leading-relaxed mb-4 line-clamp-6 overflow-hidden w-full px-2">
+        {v.example ? <UmlautRenderer text={v.example} /> : <span className="opacity-50 italic">Kein Beispiel vorhanden</span>}
       </div>
       <div className="mt-2 pt-3 border-t border-indigo-400/50 w-full text-[10px] font-black uppercase tracking-widest opacity-60 shrink-0">
         Beispielsatz (DE)
@@ -745,7 +745,7 @@ export default function App() {
   const isWordSaved = (word: string) => 
     state.customVocabulary.some(v => v.word.toLowerCase() === word.toLowerCase());
 
-  const handleToggleWord = (word: string, meaning: string, grammarNote?: string) => {
+  const handleToggleWord = (word: string, meaning: string, grammarNote?: string, example?: string) => {
     const exists = isWordSaved(word);
     if (exists) {
       setState(p => ({
@@ -756,7 +756,7 @@ export default function App() {
     } else {
       setState(p => ({
         ...p,
-        customVocabulary: [...p.customVocabulary, { word, meaning, grammarNote, addedAt: Date.now() }]
+        customVocabulary: [...p.customVocabulary, { word, meaning, grammarNote, example, addedAt: Date.now() }]
       }));
       setNotification({ message: `"${word}" wurde gespeichert`, type: 'success' });
     }

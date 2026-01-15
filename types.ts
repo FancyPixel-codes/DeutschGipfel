@@ -48,6 +48,7 @@ export interface CustomWord {
   word: string;
   meaning: string;
   grammarNote?: string;
+  example?: string;
   addedAt: number;
 }
 

@@ -95,11 +95,11 @@ export async function generateLessonContent(chapterId: string, title: string, to
   };
 }
 
-export async function translateWordAndGetGrammar(word: string, context: string): Promise<{ translation: string; grammarNote: string }> {
+export async function translateWordAndGetGrammar(word: string, context: string): Promise<{ translation: string; grammarNote: string; example: string }> {
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Translate the German word "${word}" to English and provide a very brief B2-level grammar tip. 
-    Context: "...${context.slice(0, 100)}..."
+    contents: `Translate the German word "${word}" to English, provide a very brief B2-level grammar tip, and create one natural German example sentence using the word. 
+    Context of the original text: "...${context.slice(0, 100)}..."
     Format as JSON.`,
     config: {
       responseMimeType: "application/json",
@@ -107,9 +107,10 @@ export async function translateWordAndGetGrammar(word: string, context: string):
         type: Type.OBJECT,
         properties: {
           translation: { type: Type.STRING },
-          grammarNote: { type: Type.STRING }
+          grammarNote: { type: Type.STRING },
+          example: { type: Type.STRING }
         },
-        required: ["translation", "grammarNote"]
+        required: ["translation", "grammarNote", "example"]
       }
     }
   });
