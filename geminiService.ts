@@ -5,21 +5,26 @@ import { Lesson, HomeworkFeedback } from "./types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
- * Generates a full B2 German lesson.
- * Optimized with gemini-3-flash-preview for significantly faster response times.
+ * Generates a full B2 German lesson with a rich set of structured homework tasks.
  */
 export async function generateLessonContent(chapterId: string, title: string, topic: string): Promise<Lesson> {
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `Generate a comprehensive B2 German lesson based on the theme "${title}: ${topic}". 
     The lesson must include:
-    1. A sophisticated B2-level reading text (approx 400 words).
+    1. A sophisticated B2-level reading text (approx 450 words).
     2. A glossary: An array of objects where each object has a "german" key (difficult word) and an "english" key (its translation).
-    3. 15 key vocabulary terms. IMPORTANT: If the word is a noun, provide it WITHOUT the article (e.g., 'Brauch' instead of 'der Brauch').
-       - For each term: provide word, meaning (English), gender (der, die, das, plural, none), plural suffix (e.g., 'e', 'en', 'n', 'er', 's', or '-' for no change), and example (a short, natural German sentence using the word).
+    3. 15 key vocabulary terms. IMPORTANT: 
+       - For nouns, provide word (singular), gender, meaning (English), example sentence.
+       - ALSO provide "pluralWord": The FULL plural form (e.g., 'die Häuser' or 'die Bräuche'). 
+       - If it's a verb or adj with no plural, leave pluralWord null.
     4. A grammar explanation relevant to B2 level.
     5. A listening script.
-    6. A homework writing prompt.`,
+    6. SEVEN Structured Homework Tasks (homeworkTasks) that are clear and solvable:
+       - Task 1 & 2: Leseverstehen (multiple-choice). Two distinct comprehension questions about the reading text, each with 4 clear options.
+       - Task 3 & 4: Wortschatz (cloze). Sentences or short paragraphs using lesson vocabulary with [____] blanks. 
+       - Task 5 & 6: Grammatik (cloze). Exercises requiring transformation or application of the lesson's grammar point (e.g., passive, konjunktiv).
+       - Task 7: Schreibaufgabe (writing). A complex B2 writing scenario (min 150 words).`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -45,7 +50,7 @@ export async function generateLessonContent(chapterId: string, title: string, to
                 word: { type: Type.STRING },
                 meaning: { type: Type.STRING },
                 gender: { type: Type.STRING, enum: ["der", "die", "das", "plural", "none"] },
-                plural: { type: Type.STRING },
+                pluralWord: { type: Type.STRING, nullable: true },
                 example: { type: Type.STRING }
               },
               required: ["word", "meaning", "gender", "example"]
@@ -61,9 +66,23 @@ export async function generateLessonContent(chapterId: string, title: string, to
             required: ["title", "explanation", "examples"]
           },
           listeningScript: { type: Type.STRING },
-          homeworkPrompt: { type: Type.STRING }
+          homeworkTasks: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                type: { type: Type.STRING, enum: ["multiple-choice", "cloze", "writing"] },
+                title: { type: Type.STRING },
+                instruction: { type: Type.STRING },
+                question: { type: Type.STRING },
+                options: { type: Type.ARRAY, items: { type: Type.STRING } },
+                solution: { type: Type.STRING }
+              },
+              required: ["type", "title", "instruction", "solution"]
+            }
+          }
         },
-        required: ["readingText", "glossary", "vocabulary", "grammarPoint", "listeningScript", "homeworkPrompt"]
+        required: ["readingText", "glossary", "vocabulary", "grammarPoint", "listeningScript", "homeworkTasks"]
       }
     }
   });
@@ -79,19 +98,17 @@ export async function generateLessonContent(chapterId: string, title: string, to
     });
   }
 
-  const [chapterNum] = chapterId.split('.');
-
   return {
     id: chapterId,
     module: 1,
-    chapter: parseInt(chapterNum),
+    chapter: parseInt(chapterId.split('.')[0]),
     title,
     topic,
     content: {
       ...rawData,
       glossary: glossaryRecord
     },
-    homeworkPrompt: rawData.homeworkPrompt
+    homeworkPrompt: rawData.homeworkTasks.find((t: any) => t.type === 'writing')?.instruction || "Schreibe einen Text."
   };
 }
 
@@ -99,7 +116,7 @@ export async function translateWordAndGetGrammar(word: string, context: string):
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `Translate the German word "${word}" to English, provide a very brief B2-level grammar tip, and create one natural German example sentence using the word. 
-    Context of the original text: "...${context.slice(0, 100)}..."
+    Context: "...${context.slice(0, 100)}..."
     Format as JSON.`,
     config: {
       responseMimeType: "application/json",
@@ -123,7 +140,7 @@ export async function translateWordAndGetGrammar(word: string, context: string):
 export async function gradeHomework(prompt: string, userText: string): Promise<HomeworkFeedback> {
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `As a professional German B2 teacher, evaluate the student response for the prompt: "${prompt}".
+    contents: `As a professional German B2 teacher, evaluate the student response for the writing prompt: "${prompt}".
     Student Text: "${userText}"
     Format feedback as JSON.`,
     config: {
@@ -158,7 +175,6 @@ export async function gradeHomework(prompt: string, userText: string): Promise<H
   return JSON.parse(text);
 }
 
-// Helper function to decode base64 string to Uint8Array
 function decode(base64: string): Uint8Array {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -169,7 +185,6 @@ function decode(base64: string): Uint8Array {
   return bytes;
 }
 
-// Helper function to decode raw PCM audio data to AudioBuffer
 async function decodeAudioData(
   data: Uint8Array,
   ctx: AudioContext,
@@ -189,9 +204,6 @@ async function decodeAudioData(
   return buffer;
 }
 
-/**
- * Uses Gemini TTS to read German text aloud.
- */
 export async function playTextToSpeech(text: string): Promise<void> {
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
@@ -210,13 +222,7 @@ export async function playTextToSpeech(text: string): Promise<void> {
   if (!base64Audio) return;
 
   const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-  const audioBuffer = await decodeAudioData(
-    decode(base64Audio),
-    audioContext,
-    24000,
-    1
-  );
-
+  const audioBuffer = await decodeAudioData(decode(base64Audio), audioContext, 24000, 1);
   const source = audioContext.createBufferSource();
   source.buffer = audioBuffer;
   source.connect(audioContext.destination);

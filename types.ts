@@ -1,4 +1,13 @@
 
+export interface HomeworkTask {
+  type: 'multiple-choice' | 'cloze' | 'writing';
+  title: string;
+  instruction: string;
+  question?: string;
+  options?: string[];
+  solution: string;
+}
+
 export interface Lesson {
   id: string;
   module: number;
@@ -12,7 +21,7 @@ export interface Lesson {
       word: string; 
       meaning: string;
       gender: 'der' | 'die' | 'das' | 'plural' | 'none';
-      plural?: string;
+      pluralWord?: string; // Full plural form for highlighting diffs
       example?: string;
     }>;
     grammarPoint: {
@@ -21,6 +30,7 @@ export interface Lesson {
       examples: string[];
     };
     listeningScript: string;
+    homeworkTasks: HomeworkTask[];
   };
   homeworkPrompt: string;
 }
