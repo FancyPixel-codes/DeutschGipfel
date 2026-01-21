@@ -3,8 +3,15 @@ import { GoogleGenAI, Modality, Type } from "@google/genai";
 import { Lesson, HomeworkFeedback } from "./types";
 import { STATIC_LESSON_DATA } from "./constants";
 
-// Initialize the Gemini API client
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the Gemini API client only if API key is available
+let ai: GoogleGenAI | null = null;
+try {
+  if (process.env.API_KEY) {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  }
+} catch (error) {
+  console.warn("Failed to initialize Gemini AI client:", error);
+}
 
 /**
  * Audio decoding helpers for PCM data returned by the TTS model.
@@ -43,6 +50,10 @@ async function decodeAudioData(
  */
 let audioContext: AudioContext | null = null;
 let currentSource: AudioBufferSourceNode | null = null;
+
+export function isAiAvailable(): boolean {
+  return ai !== null;
+}
 
 export function stopAudio() {
   if (currentSource) {
@@ -84,6 +95,9 @@ export async function generateLessonContent(chapterId: string, title: string, to
  * Uses Gemini to translate and provide grammar context for new words.
  */
 export async function translateWordAndGetGrammar(word: string, context: string): Promise<{ translation: string; grammarNote: string; example: string }> {
+  if (!ai) {
+    throw new Error("Gemini AI client not available. Please check your API key configuration.");
+  }
   // Use gemini-3-flash-preview for quick translation tasks
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -109,6 +123,9 @@ export async function translateWordAndGetGrammar(word: string, context: string):
  * Uses Gemini to grade homework submissions with specific corrections.
  */
 export async function gradeHomework(prompt: string, userText: string): Promise<HomeworkFeedback> {
+  if (!ai) {
+    throw new Error("Gemini AI client not available. Please check your API key configuration.");
+  }
   // Use gemini-3-pro-preview for complex grading tasks
   const response = await ai.models.generateContent({
     model: 'gemini-3-pro-preview',
@@ -152,6 +169,9 @@ export async function gradeHomework(prompt: string, userText: string): Promise<H
  * This provides a natural, "normal" human voice.
  */
 export async function playTextToSpeech(text: string, onEnded?: () => void): Promise<void> {
+  if (!ai) {
+    throw new Error("Gemini AI client not available. Please check your API key configuration.");
+  }
   // Cancel any ongoing audio first
   stopAudio();
 

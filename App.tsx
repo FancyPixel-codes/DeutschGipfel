@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ASPEKTE_CHAPTERS, B1_GRAMMAR, B2_GRAMMAR } from './constants';
 import { Lesson, AppState, HomeworkSubmission, CustomWord } from './types';
-import { generateLessonContent, gradeHomework, playTextToSpeech, translateWordAndGetGrammar, stopAudio } from './geminiService';
+import { generateLessonContent, gradeHomework, playTextToSpeech, translateWordAndGetGrammar, stopAudio, isAiAvailable } from './geminiService';
 
 const GrammarCard: React.FC<{ title: string; explanation: string; examples: string[]; index?: number }> = ({ title, explanation, examples, index }) => (
   <div className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300">
@@ -69,10 +69,15 @@ const App: React.FC = () => {
   const [homeworkText, setHomeworkText] = useState('');
   const [isGrading, setIsGrading] = useState(false);
   const [isReading, setIsReading] = useState(false);
+  const [aiAvailable, setAiAvailable] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('aspekte_app_state', JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    setAiAvailable(isAiAvailable());
+  }, []);
 
   const currentLesson = state.currentLessonId ? state.lessonCache[state.currentLessonId] : null;
 
@@ -126,9 +131,16 @@ const App: React.FC = () => {
         const newWord: CustomWord = { word, meaning, example, addedAt: Date.now() };
         setState(prev => ({ ...prev, customVocabulary: [newWord, ...prev.customVocabulary] }));
       } else {
-        const data = await translateWordAndGetGrammar(word, "B2 context");
-        const newWord: CustomWord = { word, meaning: data.translation, grammarNote: data.grammarNote, example: data.example, addedAt: Date.now() };
-        setState(prev => ({ ...prev, customVocabulary: [newWord, ...prev.customVocabulary] }));
+        try {
+          const data = await translateWordAndGetGrammar(word, "B2 context");
+          const newWord: CustomWord = { word, meaning: data.translation, grammarNote: data.grammarNote, example: data.example, addedAt: Date.now() };
+          setState(prev => ({ ...prev, customVocabulary: [newWord, ...prev.customVocabulary] }));
+        } catch (error) {
+          console.error("Translation failed", error);
+          // Fallback: add word without translation
+          const newWord: CustomWord = { word, meaning: "Translation unavailable", addedAt: Date.now() };
+          setState(prev => ({ ...prev, customVocabulary: [newWord, ...prev.customVocabulary] }));
+        }
       }
     }
   };
@@ -139,7 +151,12 @@ const App: React.FC = () => {
       setIsReading(false);
     } else if (currentLesson) {
       setIsReading(true);
-      await playTextToSpeech(currentLesson.content.readingText, () => setIsReading(false));
+      try {
+        await playTextToSpeech(currentLesson.content.readingText, () => setIsReading(false));
+      } catch (error) {
+        console.error("Text-to-speech failed", error);
+        setIsReading(false);
+      }
     }
   };
 
@@ -149,6 +166,12 @@ const App: React.FC = () => {
         <div className="p-8">
           <h1 className="text-3xl font-extrabold text-blue-400 tracking-tighter">DeutschGipfel</h1>
           <p className="text-xs text-slate-400 mt-2 uppercase tracking-widest font-bold">Aspekte neu B2</p>
+          {!aiAvailable && (
+            <div className="mt-4 p-3 bg-yellow-900/50 border border-yellow-600/50 rounded-lg">
+              <p className="text-xs text-yellow-200 font-medium">⚠️ AI features unavailable</p>
+              <p className="text-xs text-yellow-300 mt-1">Configure API_KEY for grading and translation</p>
+            </div>
+          )}
         </div>
         <nav className="flex-1 overflow-y-auto space-y-6 pb-8">
           <div>
@@ -193,7 +216,7 @@ const App: React.FC = () => {
               {state.customVocabulary.map((v, i) => (
                 <div key={i} className="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm relative group">
                   <button onClick={() => handleToggleCustomWord(v.word)} className="absolute top-6 right-6 text-red-500 font-black text-2xl">–</button>
-                  <div className="flex items-center gap-4 mb-2"><span className="text-2xl font-black">{v.word}</span><button onClick={() => playTextToSpeech(v.word)} className="text-blue-500">🔊</button></div>
+                  <div className="flex items-center gap-4 mb-2"><span className="text-2xl font-black">{v.word}</span><button onClick={() => aiAvailable && playTextToSpeech(v.word)} className={`${aiAvailable ? 'text-blue-500 hover:text-blue-700' : 'text-slate-400 cursor-not-allowed'}`}>🔊</button></div>
                   <p className="text-blue-700 font-bold mb-2">{v.meaning}</p>
                   {v.example && <p className="text-slate-500 italic text-sm">"{v.example}"</p>}
                 </div>
@@ -218,8 +241,8 @@ const App: React.FC = () => {
                 <div className="max-w-3xl mx-auto">
                   <div className="flex justify-between items-center mb-8">
                     <h3 className="text-2xl font-black text-slate-800">Lehrbuch Text</h3>
-                    <button onClick={handlePlayReading} className={`px-8 py-3 rounded-full font-black text-white shadow-lg transition-all ${isReading ? 'bg-red-500' : 'bg-blue-600 hover:scale-105 active:scale-95'}`}>
-                      {isReading ? '⏹ Stopp' : '🔊 Vorlesen'}
+                    <button onClick={handlePlayReading} disabled={!aiAvailable} className={`px-8 py-3 rounded-full font-black text-white shadow-lg transition-all ${!aiAvailable ? 'bg-slate-400' : isReading ? 'bg-red-500' : 'bg-blue-600 hover:scale-105 active:scale-95'}`}>
+                      {!aiAvailable ? '🔇 Nicht verfügbar' : isReading ? '⏹ Stopp' : '🔊 Vorlesen'}
                     </button>
                   </div>
                   <div className="text-slate-800 leading-relaxed text-2xl space-y-8 font-serif">
@@ -297,8 +320,8 @@ const App: React.FC = () => {
                           ) : (
                             <div className="space-y-6">
                               <textarea value={homeworkText} onChange={(e) => setHomeworkText(e.target.value)} placeholder="Schreiben Sie hier Ihren Text..." className="w-full h-80 p-10 border-4 border-white rounded-[2.5rem] focus:ring-8 focus:ring-blue-50 focus:border-blue-500 outline-none resize-none font-serif text-xl leading-relaxed shadow-inner bg-white/50" />
-                              <button onClick={handleGradeHomework} disabled={isGrading || homeworkText.trim().length < 50} className={`w-full py-6 rounded-full font-black text-xl transition-all shadow-xl flex justify-center items-center gap-4 ${isGrading || homeworkText.trim().length < 50 ? 'bg-slate-200 text-slate-400' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>
-                                {isGrading ? <><span className="animate-spin text-2xl">◎</span> Prüfen...</> : 'Korrektur anfordern'}
+                              <button onClick={handleGradeHomework} disabled={isGrading || homeworkText.trim().length < 50 || !aiAvailable} className={`w-full py-6 rounded-full font-black text-xl transition-all shadow-xl flex justify-center items-center gap-4 ${isGrading || homeworkText.trim().length < 50 || !aiAvailable ? 'bg-slate-200 text-slate-400' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>
+                                {isGrading ? <><span className="animate-spin text-2xl">◎</span> Prüfen...</> : !aiAvailable ? 'AI nicht verfügbar' : 'Korrektur anfordern'}
                               </button>
                             </div>
                           )}
