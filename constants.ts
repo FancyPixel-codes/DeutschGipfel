@@ -10,13 +10,25 @@ export const ASPEKTE_CHAPTERS = [
   { id: '2.1', module: 1, chapter: 2, part: 1, title: 'Gesten sagen mehr als tausend Worte', topic: 'Nonverbale Kommunikation' },
   { id: '2.2', module: 1, chapter: 2, part: 2, title: 'Sprachen kinderleicht?!', topic: 'Frühes Fremdsprachenlernen' },
   { id: '2.3', module: 1, chapter: 2, part: 3, title: 'Smalltalk', topic: 'Die Kunst der kleinen Worte' },
-  { id: '2.4', module: 1, chapter: 2, part: 4, title: 'Wenn zwei sich streiten...', topic: 'Konstruktive Kritik' },
+  { id: '2.4', module: 1, chapter: 2, part: 4, title: 'Wenn zwei sich streiten...', topic: 'Konfliktlösung' },
 
   // Kapitel 3: Arbeit ist das halbe Leben?
   { id: '3.1', module: 1, chapter: 3, part: 1, title: 'Mein Weg zum Job', topic: 'Stellensuche' },
   { id: '3.2', module: 1, chapter: 3, part: 2, title: 'Glücklich im Job?', topic: 'Arbeitszufriedenheit' },
   { id: '3.3', module: 1, chapter: 3, part: 3, title: 'Teamgeist', topic: 'Teambildung' },
   { id: '3.4', module: 1, chapter: 3, part: 4, title: 'Werben Sie für sich!', topic: 'Lebenslauf & Bewerbung' },
+
+  // Kapitel 4: Zusammen leben
+  { id: '4.1', module: 2, chapter: 4, part: 1, title: 'Sport gegen Gewalt', topic: 'Jugendprojekte' },
+  { id: '4.2', module: 2, chapter: 4, part: 2, title: 'Armut', topic: 'Soziale Herausforderungen' },
+  { id: '4.3', module: 2, chapter: 4, part: 3, title: 'Im Netz', topic: 'Internetverhalten' },
+  { id: '4.4', module: 2, chapter: 4, part: 4, title: 'Der kleine Unterschied', topic: 'Rollenbilder' },
+
+  // Kapitel 5: Wer Wissen schafft
+  { id: '5.1', module: 2, chapter: 5, part: 1, title: 'Wissenschaft für Kinder', topic: 'Nachwuchsförderung' },
+  { id: '5.2', module: 2, chapter: 5, part: 2, title: 'Wer einmal lügt...', topic: 'Wahrheit & Lüge' },
+  { id: '5.3', module: 2, chapter: 5, part: 3, title: 'Ist da jemand?', topic: 'Zukunftsvisionen' },
+  { id: '5.4', module: 2, chapter: 5, part: 4, title: 'Gute Nacht!', topic: 'Schlafforschung' },
 ];
 
 export const B1_GRAMMAR = [
@@ -42,83 +54,78 @@ export const B2_GRAMMAR = [
     ]
   },
   {
-    title: "Vergleichssätze mit 'als' und 'wie'",
-    explanation: "Gleichheit: so / genauso + Grundform + wie. Ungleichheit: Komparativ + als.",
+    title: "Relativsätze mit 'wer'",
+    explanation: "Werden verwendet, um Personen unbestimmt zu beschreiben. Sie beginnen mit 'wer', 'wen', 'wem'. Im Hauptsatz steht oft ein Demonstrativpronomen wie 'der', 'den', 'dem'.",
     examples: [
-      "Körpersprache ist genauso wichtig wie die gesprochene Sprache.",
-      "Botschaften nehmen wir viel schneller wahr, als wir meinen."
+      "Wer erwischt wurde, der bekam Hausverbot.",
+      "Wem er Taekwondo beibringt, der merkt schnell, dass es keinen Sinn macht, Mist zu bauen."
     ]
   },
   {
-    title: "Zweiteilige Konnektoren",
-    explanation: "Verbinden Sätze oder Satzteile paarweise, um Aufzählungen, Alternativen oder Gegensätze auszudrücken.",
+    title: "Passiv und Passiversatzformen",
+    explanation: "Neben dem Passiv mit 'werden' gibt es Alternativen: 'sein + zu + Infinitiv' (müssen/können), 'sich lassen + Infinitiv' (können) oder Adjektive auf -bar/-lich.",
     examples: [
-      "nicht nur ..., sondern auch (Aufzählung)",
-      "weder ... noch (negative Aufzählung)",
-      "entweder ... oder (Alternative)",
-      "zwar ... aber (Einschränkung)"
+      "Die Begeisterung ist zu wecken. (= muss geweckt werden)",
+      "Die Scheu lässt sich abbauen. (= kann abgebaut werden)",
+      "Experimente sind durchführbar. (= können durchgeführt werden)"
     ]
   }
 ];
 
 export const STATIC_LESSON_DATA: Record<string, any> = {
   "1.1": {
-    readingText: "Mein Glück in der neuen Heimat\ngeschrieben am 17. Dezember von Ella Australia\n\nSoll ich das wirklich riskieren? Mein gewohntes Leben aufgeben, den Job kündigen, Familie und Freunde verlassen und in einem anderen Land komplett neu anfangen? Ich habe es gewagt! Ich bin letztes Jahr aus Liebe ziemlich spontan nach Australien ausgewandert.\n\nEigentlich bin ich gar kein so besonders abenteuerlicher Typ. Aber als ich vor zwei Jahren zufällig diesen netten Typen während meines Urlaubs kennengelernt hatte, beschloss ich, mein Leben komplett zu ändern. Das war ganz schön aufregend. Ich musste so viel erledigen! Visum, Zeugnisse übersetzen lassen, Wohnung auflösen...\n\nDer Anfang in einem neuen Land ist allerdings ganz schön schwierig. Ich kannte niemanden außer David, musste mir Arbeit suchen und eine Arbeitserlaubnis zu bekommen war schwieriger, als ich gedacht hatte. Ich hatte ziemlich großes Heimweh. Aber ich habe nicht aufgegeben und zum Glück irgendwann eine Stelle als Grafikerin gefunden.",
-    glossary: { "auswandern": "emigrate", "auflösen": "dissolve/terminate", "Heimweh": "homesickness" },
+    readingText: "Mein Glück in der neuen Heimat\nSoll ich das wirklich riskieren? Mein gewohntes Leben aufgeben, den Job kündigen, Familie und Freunde verlassen und in einem anderen Land komplett neu anfangen? Ich habe es gewagt! Ich bin letztes Jahr aus Liebe ziemlich spontan nach Australien ausgewandert. Eigentlich bin ich gar kein so besonders abenteuerlicher Typ. Aber als ich vor zwei Jahren zufällig David kennengelernt hatte, beschloss ich, mein Leben komplett zu ändern. Das war ganz schön aufregend. Ich musste mich um ein Visum kümmern, meine Zeugnisse übersetzen lassen, meine Wohnung auflösen usw.\nDer Anfang in einem neuen Land ist allerdings ganz schön schwierig. Ich kannte niemanden außer David, musste mir Arbeit suchen und eine Arbeitserlaubnis zu bekommen war schwieriger, als ich gedacht hatte. Ich hatte ziemlich großes Heimweh. Aber ich habe nicht aufgegeben und zum Glück eine Stelle als Grafikerin gefunden.",
+    glossary: { "auswandern": "to emigrate", "auflösen": "to terminate/dissolve", "Heimweh": "homesickness" },
     vocabulary: [
-      { word: "auswandern", gender: "none", meaning: "to emigrate", example: "Sie ist letztes Jahr nach Australien ausgewandert." },
+      { word: "auswandern", gender: "none", meaning: "to emigrate", example: "Sie ist nach Australien ausgewandert." },
       { word: "das Heimweh", gender: "das", meaning: "homesickness", example: "Ella hatte am Anfang großes Heimweh." },
       { word: "die Arbeitserlaubnis", gender: "die", meaning: "work permit", example: "Es war schwer, eine Arbeitserlaubnis zu bekommen." }
     ],
     grammarPoint: {
-      title: "Angaben im Mittelfeld",
-      explanation: "Die Reihenfolge folgt oft: temporal (Wann?) - kausal (Warum?) - modal (Wie?) - lokal (Wo?). Kurz: tekamolo.",
-      examples: ["Ich bin letztes Jahr aus Liebe ziemlich spontan nach Australien ausgewandert."]
+      title: "Angaben im Mittelfeld (TEKAMOLO)",
+      explanation: "Temporal - Kausal - Modal - Lokal. Wenn man eine Angabe besonders betonen möchte, kann man sie auf Position 1 stellen.",
+      examples: ["Aus Liebe bin ich letztes Jahr ziemlich spontan nach Australien ausgewandert."]
     },
-    listeningScript: "Ella berichtet von ihren ersten Monaten in Sydney und der Herausforderung, eine Wohnung zu finden.",
     homeworkTasks: [
-      { type: "multiple-choice", title: "Wortstellung (WB S.10)", instruction: "Wählen Sie die richtige Position für die Pronomen.", question: "Maria hat ein Visum beantragt. Das Konsulat hat ...", options: ["ihr es dann zugeschickt", "es ihr dann zugeschickt", "dann es ihr zugeschickt"], solution: "es ihr dann zugeschickt" },
-      { type: "multiple-choice", title: "Tekamolo (WB S.10)", instruction: "Welche Reihenfolge ist korrekt?", question: "Wir sind geflogen: (zu Ella / letzten Monat / ganz spontan)", options: ["Wir sind letzten Monat ganz spontan zu Ella geflogen.", "Wir sind zu Ella letzten Monat ganz spontan geflogen.", "Wir sind ganz spontan letzten Monat zu Ella geflogen."], solution: "Wir sind letzten Monat ganz spontan zu Ella geflogen." },
-      { type: "writing", title: "Textproduktion", instruction: "Können Sie sich vorstellen, selbst auszuwandern? Wohin würden Sie gehen? Welche Schwierigkeiten könnten auftreten? (Lehrbuch S. 23)", solution: "Individuell" }
+      { type: "multiple-choice", title: "Wortstellung", instruction: "Wählen Sie die richtige Position.", question: "Ein Bekannter hat Ella letztes Jahr netterweise ... geholfen.", options: ["bei der Wohnungssuche", "Wohnungssuche bei der"], solution: "bei der Wohnungssuche" },
+      { type: "writing", title: "Erfahrungsbericht", instruction: "Schreiben Sie einen kurzen Text über Ihre eigenen Erfahrungen im Ausland oder einen Wunschort.", solution: "Individuell" }
     ]
   },
-  "1.2": {
-    readingText: "Unsere Muttersprache - Ein Stück Heimat\nDie Schweiz war von Anfang an ein vielsprachiges, multikulturelles Land, in dem mehrere Muttersprachen gesprochen werden, denn die Schweiz ist eine 'Eidgenossenschaft': Das bedeutet ein Zusammenschluss von inzwischen 26 Kantonen. Die einzelnen Kantone sind politisch sehr selbstständig und haben z.B. jeweils ein eigenes Parlament und auch unterschiedliche Amtssprachen. Schon im 17. Jahrhundert wurde jemand, der innerhalb der Schweiz reiste, schnell mit einer anderen Sprache konfrontiert. Die Verwaltungsprache war aber Deutsch. Nachdem sich das Land um französisch- und italienischsprachige Gebiete vergrößert hatte, bekamen diese Sprachen dieselbe Bedeutung. 1848 wurden alle drei als Amtssprachen anerkannt, 1938 kam Rätoromanisch dazu.",
-    glossary: { "die Eidgenossenschaft": "confederation", "der Kanton": "canton", "Amtssprache": "official language" },
+  "4.1": {
+    readingText: "Sport gegen Gewalt\nWie in jeder Großstadt gibt es auch in Hamburg soziale Probleme. Denn was machen 15-Jährige in einem sozial schwachen Stadtteil nach der Schule? Vor einigen Jahren hätten die meisten Kids von Hamburg Jenfeld geantwortet: 'Ab ins Einkaufszentrum.' Hier ist es warm und trocken und man kann sich seine Langeweile vertreiben: das eine oder andere klauen, Handtaschen stehlen, Graffiti sprühen und so weiter.\nFahim Yusufzai, ein gebürtiger Afghane, arbeitete viele Jahre als Sicherheitsleiter im Einkaufszentrum Jenfeld. Irgendwann wollte er nicht mehr tatenlos akzeptieren, dass es immer die gleichen Jugendlichen waren, die Ärger machten. Er gründete den Verein 'Sport gegen Gewalt'. Wer zu ihm ins Taekwondo-Training kommt, den bringt er nicht zur Polizei. Das regelmäßige Training stärkt das Gefühl, respektiert zu werden und etwas leisten zu können.",
+    glossary: { "vertreiben": "to drive away/kill (time)", "gebuertig": "born in", "tatenlos": "inactive" },
     vocabulary: [
-      { word: "vielsprachig", gender: "none", meaning: "multilingual", example: "Die Schweiz ist ein vielsprachiges Land." },
-      { word: "der Wandel", gender: "der", meaning: "change/transformation", example: "In letzter Zeit kann man hier einen Wandel beobachten." }
+      { word: "die Disziplin", gender: "die", meaning: "discipline", example: "Sport erfordert viel Disziplin." },
+      { word: "respektieren", gender: "none", meaning: "to respect", example: "Man muss die Regeln respektieren." }
     ],
     grammarPoint: {
-      title: "Vergleichssätze",
-      explanation: "Vergleichen Sie Zustände. Bei Gleichheit nutzt man 'wie', bei Ungleichheit 'als'.",
-      examples: ["Deutsch ist in der Schweiz verbreiteter als Italienisch.", "Er spricht genauso gut Französisch wie Deutsch."]
+      title: "Relativsätze mit 'wer'",
+      explanation: "Relativsätze mit 'wer' beschreiben eine unbestimmte Person näher. Der Nebensatz beginnt mit 'wer', der Hauptsatz oft mit 'der'.",
+      examples: ["Wer erwischt wurde, der bekam Hausverbot.", "Wem er Taekwondo beibringt, der merkt schnell, dass es keinen Sinn macht, Mist zu bauen."]
     },
-    listeningScript: "Ein Beitrag über die Sprachvielfalt in der Schweiz und die Rolle des Englischen im Berufsleben.",
     homeworkTasks: [
-      { type: "multiple-choice", title: "Inhalt (LB S.12)", instruction: "Wählen Sie die richtige Aussage zum Text.", question: "Was ist der Grund für die Vielsprachigkeit der Schweiz?", options: ["Der Zusammenschluss von 26 Kantonen", "Wegen der vielen Touristen", "Weil es nur eine Regierung gibt"], solution: "Der Zusammenschluss von 26 Kantonen" },
-      { type: "writing", title: "Forumsbeitrag", instruction: "Schreiben Sie einen Forumsbeitrag: Welche Sprachen braucht man wann und wozu in Ihrem Land? Welche Erfahrungen haben Sie beim Sprachenlernen gemacht? (LB S. 13)", solution: "Individuell" }
+      { type: "multiple-choice", title: "Relativpronomen", instruction: "Wählen Sie das richtige Pronomen.", question: "... täglich Sport treibt, wird von Krankheiten verschont.", options: ["Wer", "Wen", "Wem"], solution: "Wer" },
+      { type: "multiple-choice", title: "Dativ-Bezug", instruction: "Wählen Sie die richtige Form.", question: "... sich oft müde fühlt, ist Sport zu empfehlen.", options: ["Wer", "Wen", "Wem"], solution: "Wem" }
     ]
   },
-  "2.1": {
-    readingText: "Gesten sagen mehr als tausend Worte...\nEinen Fachtext zum Thema 'Nonverbale Kommunikation' verstehen.\n\nKörpersprache sagt oft mehr als tausend Worte. Mimik, Gestik und die Körperhaltung sind entscheidende Faktoren der Kommunikation. Forscher haben herausgefunden, dass nur ein kleiner Teil unserer Botschaft über das gesprochene Wort vermittelt wird. Der Rest wird nonverbal transportiert. In verschiedenen Kulturen können die gleichen Signale jedoch unterschiedliche Bedeutungen haben. Ein Nicken bedeutet nicht überall 'Ja'. Wer professionell kommunizieren will, muss lernen, auch auf die Zwischentöne zu achten.",
-    glossary: { "die Gestik": "gestures", "die Mimik": "facial expressions", "nonverbal": "non-verbal" },
+  "5.1": {
+    readingText: "Wissenschaft für Kinder\nOft klagen Lehrer über die mangelnde Konzentration und Motivation ihrer Schüler im Unterrichtsalltag. Doch ein Tag im 'NatLab' ist alles andere als Alltag. Die Schüler hängen einem jungen Mann an den Lippen, stellen interessierte Fragen und versuchen begeistert, Antworten zu geben. Kurze Zeit später stehen die Kinder im Labor und führen ein Experiment durch. Beim Besuch des Mitmachlabors der Freien Universität Berlin sind die Kinder konzentriert bei der Sache. Seit sie sich ihre weißen Laborkittel angezogen haben, sind sie wie ausgewechselt. Im NatLab werden die Kinder sanft und mit viel Spaß an die Wissenschaft herangeführt. Naturwissenschaftliche Phänomene sind so viel besser verständlich. Das NatLab wurde 2002 gegründet und ist nur eine von vielen Einrichtungen in der Hauptstadt.",
+    glossary: { "mangelnd": "lacking", "an den Lippen hängen": "to hang on every word", "ausgewechselt": "transformed" },
     vocabulary: [
-      { word: "verraten", gender: "none", meaning: "to betray/reveal", example: "Menschen verraten ihre Emotionen oft unbewusst." },
-      { word: "wahrnehmen", gender: "none", meaning: "to perceive", example: "Wir nehmen Körpersignale instinktiv wahr." }
+      { word: "das Phänomen", gender: "das", meaning: "phenomenon", example: "Naturwissenschaftliche Phänomene sind spannend." },
+      { word: "die Forschung", gender: "die", meaning: "research", example: "Die Forschung ist überlebenswichtig." }
     ],
     grammarPoint: {
-      title: "Vergleichssätze mit als und wie",
-      explanation: "Nebensätze mit als und wie drücken einen Vergleich aus. Sie hängen von einem Adjektiv ab.",
+      title: "Passiversatzformen",
+      explanation: "Statt Passiv mit 'werden' kann man oft 'sein + zu + Infinitiv' oder 'sich lassen + Infinitiv' verwenden.",
       examples: [
-        "Wir achten instinktiv viel mehr auf die Körpersprache, als wir meinen.",
-        "Botschaften nehmen wir so schnell wahr, wie wir gesprochene Sprache aufnehmen."
+        "Die Begeisterung ist zu wecken. (= muss geweckt werden)",
+        "Die Scheu lässt sich abbauen. (= kann abgebaut werden)"
       ]
     },
-    listeningScript: "Ein Experte spricht über die häufigsten Missverständnisse in der Körpersprache.",
     homeworkTasks: [
-      { type: "multiple-choice", title: "Vergleiche (WB S.25)", instruction: "Wählen Sie 'als' oder 'wie'.", question: "Die Körpersprache spielt eine größere Rolle, ... ich gedacht habe.", options: ["wie", "als"], solution: "als" },
-      { type: "multiple-choice", title: "Je... desto (WB S.25)", instruction: "Verbinden Sie die Sätze.", question: "Man liest viel. Der Wortschatz wird groß.", options: ["Je viel man liest, desto großer wird der Wortschatz.", "Je mehr man liest, desto größer wird der Wortschatz."], solution: "Je mehr man liest, desto größer wird der Wortschatz." }
+      { type: "multiple-choice", title: "Satzumbau", instruction: "Wählen Sie die Passiversatzform.", question: "Kinder können leicht motiviert werden. -> Kinder ...", options: ["lassen sich leicht motivieren", "sind leicht zu motivieren", "beides ist richtig"], solution: "beides ist richtig" },
+      { type: "multiple-choice", title: "Bedeutung", instruction: "Welche Bedeutung hat 'sein + zu'?", question: "Die Aufgabe ist bis morgen zu lösen.", options: ["Möglichkeit", "Notwendigkeit"], solution: "Notwendigkeit" }
     ]
   }
 };
